@@ -192,7 +192,7 @@ export default function CustomPaginationActionsTable() {
 		setRowsPerPage(parseInt(event.target.value, 10));
 		setPage(0);
 	};
-	const setCustomer = (id: number) => {
+	const setCustomer = (id: string) => {
 		if (selectedCustomer == id) {
 			setSelectedCustomer(null)
 		} else {
@@ -236,11 +236,11 @@ export default function CustomPaginationActionsTable() {
 							<StyledTableCell >{row.name}</StyledTableCell>
 							<StyledTableCell>
 								<Grid container>
-									<Grid item xs='8'>
+									<Grid item xs={8}>
 										{
-											selectedCustomer == row.id && (
+											selectedCustomer == row['id'] && (
 												<>
-													GST : {row.information.GST}
+													GST : {row.information['GST']}
 													<Divider />
 												</>
 											)
@@ -251,8 +251,8 @@ export default function CustomPaginationActionsTable() {
 										<div style={{
 											paddingLeft: '8px'
 										}}>
-											{row.information.address.line1},<br />{row.information.address.line2},<br />
-											{row.information.address.line3}
+											{row.information['address']['line1']},<br />{row['information']['address']['line2']},<br />
+											{row.information['address']['line3']}
 										</div>
 										{
 											selectedCustomer == row.id && (
@@ -271,7 +271,7 @@ export default function CustomPaginationActionsTable() {
 											)
 										}
 									</Grid>
-									<Grid item xs='4'>
+									<Grid item xs={4}>
 										{
 											selectedCustomer == row.id && (
 												<>
@@ -294,7 +294,7 @@ export default function CustomPaginationActionsTable() {
 				</TableBody>
 				<TableFooter>
 					<TableRow>
-						<TableCell colSpan='4' >
+						<TableCell colSpan={4} >
 							<div style={{ display: 'flex', justifyContent: 'space-between' }}>
 								<TextField id="outlined-basic" label="Search" variant="outlined" fullWidth onChange={handleSearchText} />
 								<FormControl className={classes.formControl}>
