@@ -6,6 +6,7 @@ export default function Navbar() {
             <ul>
             <li><Link href="/"><a>Home</a></Link></li>    
             <li><Link href="/about"><a>About</a></Link></li>    
+            <li><Link href="/dashboard"><a>Dashboard</a></Link></li>    
             </ul>
 
             <style jsx>{`
