@@ -1,6 +1,5 @@
 import React from 'react';
 import { withStyles, makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
-import { Button, Divider } from '@material-ui/core';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,19 +8,26 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
+
 import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+import FormControl from '@material-ui/core/FormControl';
+import { Button, Divider } from '@material-ui/core';
+import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
 import IconButton from '@material-ui/core/IconButton';
+
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
-import Grid from '@material-ui/core/Grid';
 import EditIcon from '@material-ui/icons/Edit';
-import TextField from '@material-ui/core/TextField';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import PersonAdd from '@material-ui/icons/PersonAdd';
+
+import AddContact from '../components/addcontact';
+import EditContact from '../components/editcontact';
 
 // Custom functions
 function createData(id: string, name: string, information: object,) {
@@ -54,6 +60,19 @@ function filterCustomer(row: object, searchText: string, filter: string) {
 	}
 	return false
 }
+
+function highlightText(txt: string, searchText: string, stat: boolean = true) {
+	let idx = txt.toLowerCase().indexOf(searchText.toLowerCase());
+	if (idx >= 0 && stat) {
+		return <>
+			{txt.substring(0, idx)}<span style={{
+				background: 'yellow'
+			}}><b>{txt.substring(idx, idx + searchText.length)}</b></span>{txt.substring(idx + searchText.length)}
+		</>
+	}
+	return txt
+}
+
 // sample data
 const rows = [
 	createData('1', 'Google', {
@@ -73,6 +92,21 @@ const rows = [
 		}
 	}),
 ];
+function handleCustomerArray(action: string, payload: any) {
+	switch (action) {
+		case 'add':
+			// payload['data] contains the data object
+			rows.push(payload['data']);
+			break;
+		case 'edit':
+			// 'index' is the position in the array and 'data' is  the data object
+			rows[payload['index']] = payload['data']
+			break;
+		default:
+			alert('no action detected');
+	}
+}
+
 // Custom Styles
 const StyledTableCell = withStyles((theme: Theme) =>
 	createStyles({
@@ -181,6 +215,8 @@ export default function CustomPaginationActionsTable() {
 	const [selectedCustomer, setSelectedCustomer] = React.useState(null);
 	const [filter, setFilter] = React.useState('all');
 	const [searchText, setSearchText] = React.useState('');
+	const [addContactToggle, setAddContactToggle] = React.useState(false);
+	const [editContactToggle, setEditContactToggle] = React.useState(null);
 	const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
 	const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
@@ -201,146 +237,173 @@ export default function CustomPaginationActionsTable() {
 	}
 	const handleSearchText = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,) => {
 		setSearchText(event.target.value)
-	}
+	};
 	const handleFilterChange = (event: React.ChangeEvent<{ value: unknown }>) => {
 		setFilter(event.target.value as string);
 	};
-
+	const handleAddContactToggle = () => {
+		setAddContactToggle(!addContactToggle);
+	};
+	const handleEditContactToggle = () => {
+		setEditContactToggle(!editContactToggle);
+	};
+	const handleEditContact = (id: string) => {
+		setEditContactToggle(id);
+	}
 	return (
-		<TableContainer component={Paper}>
-			<Table className={classes.table} aria-label="custom pagination table">
-				<colgroup>
-					<col style={{ width: '10%' }} />
-					<col style={{ width: '10%' }} />
-					<col style={{ width: '30%' }} />
-					<col style={{ width: '50%' }} />
-				</colgroup>
-				<TableHead>
-					<TableRow>
-						<StyledTableCell>Sr. No.</StyledTableCell>
-						<StyledTableCell>ID</StyledTableCell>
-						<StyledTableCell>Customer/Company&nbsp;Name</StyledTableCell>
-						<StyledTableCell>Information</StyledTableCell>
-					</TableRow>
-				</TableHead>
-				<TableBody>
-					{(rowsPerPage > 0
-						? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-						: rows
-					).filter(row => row['id'] != '0').filter(row => filterCustomer(row, searchText.toLowerCase(), filter)).map((row, index) => (
-						<StyledTableRow key={row.id} hover={true} selected={selectedCustomer == row.id} onClick={() => setCustomer(row['id'])}>
-							<StyledTableCell >{index + 1}.</StyledTableCell>
-							<StyledTableCell component="th" scope="row">
-								{row.id}
-							</StyledTableCell>
-							<StyledTableCell >{row.name}</StyledTableCell>
+		<>
+			<TableContainer component={Paper}>
+				<Table className={classes.table} aria-label="custom pagination table">
+					<colgroup>
+						<col style={{ width: '10%' }} />
+						<col style={{ width: '10%' }} />
+						<col style={{ width: '30%' }} />
+						<col style={{ width: '50%' }} />
+					</colgroup>
+					<TableHead>
+						<TableRow>
+							<StyledTableCell>Sr. No.</StyledTableCell>
+							<StyledTableCell style={{ textDecoration: filter == 'id' ? 'underline' : 'auto' }} onClick={setFilter.bind(this, 'id')}>ID</StyledTableCell>
+							<StyledTableCell style={{ textDecoration: filter == 'name' ? 'underline' : 'auto' }} onClick={setFilter.bind(this, 'name')}>Customer/Company&nbsp;Name</StyledTableCell>
 							<StyledTableCell>
-								<Grid container>
-									<Grid item xs={8}>
-										{
-											selectedCustomer == row['id'] && (
-												<>
-													GST : {row.information['GST']}
-													<Divider />
-												</>
-											)
-										}
-										<span style={{ fontWeight: 700 }}>
-											Address :
+								<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+									<span style={{ textDecoration: filter == 'information' ? 'underline' : 'auto', paddingTop: 6 }} onClick={setFilter.bind(this, 'information')}>
+										Information
+								</span>
+									<span>
+										<Button onClick={handleAddContactToggle}><PersonAdd style={{ color: 'rgb(255,255,255)' }} /></Button>
+									</span>
+								</div>
+							</StyledTableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
+						{(rowsPerPage > 0
+							? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+							: rows
+						).filter(row => row['id'] != '0').filter(row => filterCustomer(row, searchText.toLowerCase(), filter)).map((row, index) => (
+							<StyledTableRow key={row.id} hover={true} selected={selectedCustomer == row.id} onClick={() => setCustomer(row['id'])}>
+								<StyledTableCell >{index + 1}.</StyledTableCell>
+								<StyledTableCell component="th" scope="row">
+									{row.id}
+								</StyledTableCell>
+								<StyledTableCell >{highlightText(row['name'], searchText, filter == 'name' || filter == 'all')}</StyledTableCell>
+								<StyledTableCell>
+									<Grid container>
+										<Grid item xs={8}>
+											{
+												selectedCustomer == row['id'] && (
+													<>
+														GST : {highlightText(row.information['GST'], searchText, filter == 'information' || filter == 'all')}
+														<Divider />
+													</>
+												)
+											}
+											<span style={{ fontWeight: 700 }}>
+												Address :
 										</span>
-										<div style={{
-											paddingLeft: '8px'
-										}}>
-											{row.information['address']['line1']},<br />{row['information']['address']['line2']},<br />
-											{row.information['address']['line3']}
-										</div>
-										{
-											selectedCustomer == row.id && (
-												<>
-													<Divider />
-													<span style={{ fontWeight: 700 }}>
-														Order Details:
+											<div style={{
+												paddingLeft: '8px'
+											}}>
+												{highlightText(row['information']['address']['line1'], searchText, filter == 'information' || filter == 'all')},<br />
+												{highlightText(row['information']['address']['line2'], searchText, filter == 'information' || filter == 'all')},<br />
+												{highlightText(row['information']['address']['line3'], searchText, filter == 'information' || filter == 'all')}
+											</div>
+											{
+												selectedCustomer == row.id && (
+													<>
+														<Divider />
+														<span style={{ fontWeight: 700 }}>
+															Order Details:
 													</span>
-													<div style={{
-														paddingLeft: '8px'
-													}}>
-														Orders Pending : _sample_data_<br />
+														<div style={{
+															paddingLeft: '8px'
+														}}>
+															Orders Pending : _sample_data_<br />
 														Total Orders : _sample_data_
 													</div>
-												</>
-											)
-										}
+													</>
+												)
+											}
+										</Grid>
+										<Grid item xs={4}>
+											{
+												selectedCustomer == row.id && (<Button><EditIcon onClick={handleEditContact.bind(this, selectedCustomer)} /></Button>)
+											}
+										</Grid>
 									</Grid>
-									<Grid item xs={4}>
-										{
-											selectedCustomer == row.id && (
-												<>
-													{/* <Button variant="contained" fullWidth color="primary">Edit</Button> */}
-													{/* <Button variant="contained" fullWidth color="secondary">Delete</Button> */}
-													<Button><EditIcon /></Button>
-												</>
-											)
-										}
-									</Grid>
-								</Grid>
-							</StyledTableCell>
-						</StyledTableRow>
-					))}
-					{emptyRows > 0 && (
-						<StyledTableRow style={{ height: 53 * emptyRows }}>
-							<StyledTableCell colSpan={4} />
-						</StyledTableRow>
-					)}
-				</TableBody>
-				<TableFooter>
-					<TableRow>
-						<TableCell colSpan={4} >
-							<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-								<TextField id="outlined-basic" label="Search" variant="outlined" fullWidth onChange={handleSearchText} />
-								<FormControl className={classes.formControl}>
-									<InputLabel id="demo-simple-select-label">Filter</InputLabel>
-									<Select
-										labelId="demo-simple-select-label"
-										id="demo-simple-select"
-										value={filter}
-										onChange={handleFilterChange}
-									>
-										<MenuItem value={'id'}>ID</MenuItem>
-										<MenuItem value={'name'}>Customer/Company&nbsp;Name</MenuItem>
-										<MenuItem value={'information'}>Information</MenuItem>
-										<MenuItem value={'all'}>all</MenuItem>
-									</Select>
-								</FormControl>
-							</div>
-						</TableCell>
-					</TableRow>
-					<TableRow>
-						<TablePagination
-							rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-							// colSpan={3}
-							count={rows.length}
-							rowsPerPage={rowsPerPage}
-							page={page}
-							SelectProps={{
-								inputProps: { 'aria-label': 'rows per page' },
-								native: true,
-							}}
-							onChangePage={handleChangePage}
-							onChangeRowsPerPage={handleChangeRowsPerPage}
-							ActionsComponent={TablePaginationActions}
-						/>
-					</TableRow>
-				</TableFooter>
-			</Table>
+								</StyledTableCell>
+							</StyledTableRow>
+						))}
+						{emptyRows > 0 && (
+							<StyledTableRow style={{ height: 53 * emptyRows }}>
+								<StyledTableCell colSpan={4} />
+							</StyledTableRow>
+						)}
+					</TableBody>
+					<TableFooter>
+						<TableRow>
+							<TableCell colSpan={4} >
+								<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+									<TextField id="outlined-basic" label="Search" variant="outlined" fullWidth onChange={handleSearchText} />
+									<FormControl className={classes.formControl}>
+										<InputLabel id="demo-simple-select-label">Filter</InputLabel>
+										<Select
+											labelId="demo-simple-select-label"
+											id="demo-simple-select"
+											value={filter}
+											onChange={handleFilterChange}
+										>
+											<MenuItem value={'id'}>ID</MenuItem>
+											<MenuItem value={'name'}>Customer/Company&nbsp;Name</MenuItem>
+											<MenuItem value={'information'}>Information</MenuItem>
+											<MenuItem value={'all'}>all</MenuItem>
+										</Select>
+									</FormControl>
+								</div>
+							</TableCell>
+						</TableRow>
+						<TableRow>
+							<TablePagination
+								rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+								// colSpan={3}
+								count={rows.length}
+								rowsPerPage={rowsPerPage}
+								page={page}
+								SelectProps={{
+									inputProps: { 'aria-label': 'rows per page' },
+									native: true,
+								}}
+								onChangePage={handleChangePage}
+								onChangeRowsPerPage={handleChangeRowsPerPage}
+								ActionsComponent={TablePaginationActions}
+							/>
+						</TableRow>
+					</TableFooter>
+				</Table>
+				{
+					searchText && (
+						<div>
+							Search result: {(rowsPerPage > 0
+								? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+								: rows
+							).filter(row => row['id'] != '0').filter(row => filterCustomer(row, searchText.toLowerCase(), filter)).length}
+						</div>
+
+					)
+				}
+			</TableContainer>
+			<AddContact
+				addContactToggle={addContactToggle}
+				handleAddContactToggle={handleAddContactToggle}
+				handleCustomerArray={handleCustomerArray}
+			/>
 			{
-				searchText && (
-					<div>
-						Search result: {rows.length}
-					</div>
-
-				)
+				editContactToggle != null && <EditContact
+					editContactToggle={editContactToggle}
+					handleEditContactToggle={handleEditContactToggle}
+					handleCustomerArray={handleCustomerArray} />
 			}
-		</TableContainer>
-
+		</>
 	);
 }
