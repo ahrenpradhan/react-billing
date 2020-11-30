@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Head from 'next/head'
 import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -11,7 +12,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 
-import Customer from '../pages/customers'
+import Customer from '../pages/dashboard/customers'
 
 const drawerWidth = 240;
 
@@ -46,40 +47,47 @@ export default function ClippedDrawer() {
   const drawerClick = (text: string) => {
     setOption(text)
   }
-  
+
   return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar}>
-        <Toolbar>
-          <Typography variant="h6" noWrap>
-            React Bill
+    <>
+      <Head>
+        <title>Dashboard - {option}</title>
+        <link rel='icon' href='/favicon.ico' />
+      </Head>
+      <div className={classes.root}>
+        <CssBaseline />
+        <AppBar position="fixed" className={classes.appBar}>
+          <Toolbar>
+            <Typography variant="h6" noWrap>
+              Dashboard
           </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        className={classes.drawer}
-        variant="permanent"
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-      >
-        <Toolbar />
-        <div className={classes.drawerContainer}>
-          <List>
-            {['Orders', 'Customers', 'My Items'].map((text, index) => (
-              <ListItem button key={text}  selected={text==option} onClick={(value)=>drawerClick(text)}>
-                {/* <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon> */}
-                <ListItemText primary={text}/>
-              </ListItem>
-            ))}
-          </List>
-        </div>
-      </Drawer>
-      <main className={classes.content}>
-        <Toolbar />
-          <Customer/>
-        {/* <Typography paragraph>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          className={classes.drawer}
+          variant="permanent"
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+        >
+          <Toolbar />
+          <div className={classes.drawerContainer}>
+            <List>
+              {['Orders', 'Customers', 'My Items'].map((text, index) => (
+                <ListItem button key={text} selected={text == option} onClick={(value) => drawerClick(text)}>
+                  {/* <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon> */}
+                  <ListItemText primary={text} />
+                </ListItem>
+              ))}
+            </List>
+          </div>
+        </Drawer>
+        <main className={classes.content}>
+          <Toolbar />
+          {
+            option == 'Customers' && <Customer />
+          }
+          {/* <Typography paragraph>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
           ut labore et dolore magna aliqua. Rhoncus dolor purus non enim praesent elementum
           facilisis leo vel. Risus at ultrices mi tempus imperdiet. Semper risus in hendrerit
@@ -102,7 +110,8 @@ export default function ClippedDrawer() {
           nibh sit. Ornare aenean euismod elementum nisi quis eleifend. Commodo viverra maecenas
           accumsan lacus vel facilisis. Nulla posuere sollicitudin aliquam ultrices sagittis orci a.
         </Typography> */}
-      </main>
-    </div>
+        </main>
+      </div>
+    </>
   );
 }
