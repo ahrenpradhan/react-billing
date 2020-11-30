@@ -26,8 +26,8 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import EditIcon from '@material-ui/icons/Edit';
 import PersonAdd from '@material-ui/icons/PersonAdd';
 
-import AddContact from '../components/addcontact';
-import EditContact from '../components/editcontact';
+import AddContact from '../../components/addcontact';
+import EditContact from '../../components/editcontact';
 
 // Custom functions
 function createData(id: string, name: string, information: object,) {
