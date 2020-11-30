@@ -12,7 +12,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 
-import Customer from '../pages/dashboard/customers'
+import Customer from '../pages/dashboard/customers';
+import Items from '../pages/dashboard/items';
 
 const drawerWidth = 240;
 
@@ -86,6 +87,9 @@ export default function ClippedDrawer() {
           <Toolbar />
           {
             option == 'Customers' && <Customer />
+          }
+          {
+            option == 'My Items' && <Items />
           }
           {/* <Typography paragraph>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
