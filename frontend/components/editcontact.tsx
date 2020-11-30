@@ -29,26 +29,17 @@ const useStyles = makeStyles((theme: Theme) =>
 );
 
 
-export default function AddContact({
+export default function EditContact({
     editContactToggle,
-    handleEditContactToggle,
-	handleCustomerArray
+	handleEditContact,
+    handleCustomerArray,
+	customerData,
+	index = null
 }) {
 	const classes = useStyles();
 
 	const [value, setValue] = React.useState(0);
-	const [data, setData] = React.useState({
-		'id':'12332',
-		'name': '',
-		'information': {
-			'GST': '',
-			'address': {
-				'line1': '',
-				'line2': '',
-				'line3': ''
-			}
-		}
-	});
+    const [data, setData] = React.useState(customerData);
 
 	const handleUpdateDate = (action: string, event: React.ChangeEvent<HTMLInputElement>) => {
 		switch (action) {
@@ -97,7 +88,7 @@ export default function AddContact({
 			case 'phone':
 				return null;
 				break;
-			case 'enail':
+			case 'email':
 				return null;
 			default:
 				alert('no action detected');
@@ -107,7 +98,8 @@ export default function AddContact({
 	}
 
 	const handleClose = () => {
-        handleEditContactToggle();
+		handleEditContact(null);
+		// setData({})
 	};
 
 	const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
@@ -115,7 +107,7 @@ export default function AddContact({
 	};
 
 	const handleSave = () => {
-		handleCustomerArray('edit',{data})
+		handleCustomerArray('edit',{data,index})
 		handleClose();
 	}
 
@@ -226,7 +218,7 @@ export default function AddContact({
 												variant="outlined"
 												fullWidth
 											/>
-										</Grid>
+										</Grid >
 									</Grid>
 									<Grid item xs={12}>
 										<TextField
