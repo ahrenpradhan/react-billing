@@ -167,7 +167,11 @@ export default function AddContact({
 					</Paper>
 					<div style={{ paddingTop: 16 }}>
 						{value == 0 ? (
-							<form className={classes.root} noValidate autoComplete="off">
+							<form
+								className={classes.root}
+								noValidate
+								autoComplete="off"
+							>
 								<Grid container>
 									<Grid item xs={12}>
 										<TextField

@@ -26,8 +26,8 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import EditIcon from '@material-ui/icons/Edit';
 import PersonAdd from '@material-ui/icons/PersonAdd';
 
-import AddContact from '../components/addcontact';
-import EditContact from '../components/editcontact';
+import AddContact from '../../components/addcontact';
+import EditContact from '../../components/editcontact';
 
 // Custom functions
 function createData(id: string, name: string, information: object,) {
@@ -74,7 +74,7 @@ function highlightText(txt: string, searchText: string, stat: boolean = true) {
 }
 
 // sample data
-const rows = [
+let rows = [
 	createData('1', 'Google', {
 		'GST': '129387912873',
 		'address': {
@@ -100,7 +100,9 @@ function handleCustomerArray(action: string, payload: any) {
 			break;
 		case 'edit':
 			// 'index' is the position in the array and 'data' is  the data object
-			rows[payload['index']] = payload['data']
+			// rows[payload['index']] = payload['data']
+			// currently i will be determining the index here itself
+			rows = rows.map(row => row.id == payload['data']['id'] ? payload['data']:row)
 			break;
 		default:
 			alert('no action detected');
@@ -208,7 +210,7 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
 	);
 }
 // Main Component
-export default function CustomPaginationActionsTable() {
+export default function CustomerTab() {
 	const classes = useStyles2();
 	const [page, setPage] = React.useState(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -229,9 +231,12 @@ export default function CustomPaginationActionsTable() {
 		setPage(0);
 	};
 	const setCustomer = (id: string) => {
-		if (selectedCustomer == id) {
-			setSelectedCustomer(null)
-		} else {
+		// if (selectedCustomer == id) {
+		// 	setSelectedCustomer(null)
+		// } else {
+		// 	setSelectedCustomer(id)
+		// }
+		if (id) {
 			setSelectedCustomer(id)
 		}
 	}
@@ -248,7 +253,7 @@ export default function CustomPaginationActionsTable() {
 		setEditContactToggle(!editContactToggle);
 	};
 	const handleEditContact = (id: string) => {
-		setEditContactToggle(id);
+		!!id ? setEditContactToggle(id) : setEditContactToggle(null);
 	}
 	return (
 		<>
@@ -399,10 +404,13 @@ export default function CustomPaginationActionsTable() {
 				handleCustomerArray={handleCustomerArray}
 			/>
 			{
-				editContactToggle != null && <EditContact
+				editContactToggle != null &&
+				<EditContact
 					editContactToggle={editContactToggle}
-					handleEditContactToggle={handleEditContactToggle}
-					handleCustomerArray={handleCustomerArray} />
+					handleEditContact={handleEditContact}
+					handleCustomerArray={handleCustomerArray}
+					customerData={rows.filter(row => row['id'] == selectedCustomer)[0]}
+				/>
 			}
 		</>
 	);
